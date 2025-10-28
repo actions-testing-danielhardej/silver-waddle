@@ -1,0 +1,27 @@
+name: 03 - Matrix Strategy
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  test-matrix:
+    runs-on: arc-runner-set
+    strategy:
+      matrix:
+        version: [1, 2, 3]
+        environment: [dev, staging, prod]
+    steps:
+      - name: Print matrix values
+        run: |
+          echo "Testing version ${{ matrix.version }} in ${{ matrix.environment }}"
+          echo "Job index: ${{ strategy.job-index }}"
+      
+      - name: Simulate test
+        run: |
+          echo "Running tests for version ${{ matrix.version }}"
+          sleep 2
+          echo "Tests completed successfully!"

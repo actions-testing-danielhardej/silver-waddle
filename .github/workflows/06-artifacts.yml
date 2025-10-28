@@ -1,0 +1,47 @@
+name: 06 - Artifacts
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  create-artifact:
+    runs-on: arc-runner-set
+    steps:
+      - name: Create files
+        run: |
+          mkdir -p output
+          echo "Build artifact content" > output/build.txt
+          echo "Log content" > output/log.txt
+          date > output/timestamp.txt
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: output/
+          retention-days: 5
+  
+  use-artifact:
+    needs: create-artifact
+    runs-on: arc-runner-set
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: downloaded/
+      
+      - name: Verify artifact contents
+        run: |
+          echo "Downloaded files:"
+          ls -la downloaded/
+          echo ""
+          echo "Content of build.txt:"
+          cat downloaded/build.txt
+          echo ""
+          echo "Content of timestamp.txt:"
+          cat downloaded/timestamp.txt

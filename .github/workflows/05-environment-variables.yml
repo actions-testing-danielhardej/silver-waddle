@@ -1,0 +1,43 @@
+name: 05 - Environment Variables
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+env:
+  GLOBAL_VAR: "Global Variable Value"
+  APP_NAME: "silver-waddle"
+
+jobs:
+  env-demo:
+    runs-on: arc-runner-set
+    env:
+      JOB_VAR: "Job Level Variable"
+    steps:
+      - name: Print global environment variables
+        run: |
+          echo "Global variable: $GLOBAL_VAR"
+          echo "App name: $APP_NAME"
+      
+      - name: Print job environment variables
+        run: |
+          echo "Job variable: $JOB_VAR"
+      
+      - name: Print step environment variables
+        env:
+          STEP_VAR: "Step Level Variable"
+        run: |
+          echo "Step variable: $STEP_VAR"
+      
+      - name: Print GitHub context variables
+        run: |
+          echo "Repository: ${{ github.repository }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "SHA: ${{ github.sha }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Workflow: ${{ github.workflow }}"
+          echo "Run ID: ${{ github.run_id }}"
+          echo "Run Number: ${{ github.run_number }}"

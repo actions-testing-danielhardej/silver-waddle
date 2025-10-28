@@ -1,0 +1,52 @@
+name: 12 - Checkout and Git Operations
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  checkout-demo:
+    runs-on: arc-runner-set
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Show repository contents
+        run: |
+          echo "Repository structure:"
+          ls -la
+      
+      - name: Show git information
+        run: |
+          echo "Git branch:"
+          git branch -a
+          echo ""
+          echo "Git log:"
+          git --no-pager log --oneline -5
+          echo ""
+          echo "Git status:"
+          git --no-pager status
+      
+      - name: Show commit details
+        run: |
+          echo "Current commit SHA: ${{ github.sha }}"
+          echo "Commit message:"
+          git --no-pager log -1 --pretty=format:"%s"
+  
+  checkout-submodules:
+    runs-on: arc-runner-set
+    steps:
+      - name: Checkout with submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      
+      - name: Show full history
+        run: |
+          echo "Full git history fetched"
+          git --no-pager log --oneline --all | wc -l
+          echo "commits in history"

@@ -1,0 +1,47 @@
+name: 13 - Concurrency Control
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  concurrent-job:
+    runs-on: arc-runner-set
+    steps:
+      - name: Start job
+        run: |
+          echo "Job started at: $(date)"
+          echo "Workflow: ${{ github.workflow }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Concurrency group: ${{ github.workflow }}-${{ github.ref }}"
+      
+      - name: Simulate long-running task
+        run: |
+          echo "Processing..."
+          for i in {1..10}; do
+            echo "Step $i/10"
+            sleep 2
+          done
+          echo "Task completed!"
+      
+      - name: Finish job
+        run: 'echo "Job completed at: $(date)"'
+  
+  job-with-own-concurrency:
+    runs-on: arc-runner-set
+    concurrency:
+      group: special-group-${{ github.ref }}
+      cancel-in-progress: false
+    steps:
+      - name: Job with custom concurrency
+        run: |
+          echo "This job has its own concurrency group"
+          echo "Concurrency group: special-group-${{ github.ref }}"
+          echo "Cancel in progress: false"
