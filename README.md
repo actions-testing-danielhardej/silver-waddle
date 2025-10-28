@@ -4,7 +4,7 @@ Demo repository with comprehensive GitHub Actions workflows running on **arc-run
 
 ## Workflows Overview
 
-This repository contains 15+ demo/test workflows showcasing various GitHub Actions features:
+This repository contains 16 demo/test workflows showcasing various GitHub Actions features:
 
 ### Basic Workflows
 
