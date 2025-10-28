@@ -1,0 +1,25 @@
+name: 01 - Hello World
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  hello:
+    runs-on: arc-runner-set
+    steps:
+      - name: Print greeting
+        run: echo "Hello, World from arc-runner-set!"
+      
+      - name: Show runner info
+        run: |
+          echo "Runner name: $RUNNER_NAME"
+          echo "Runner OS: $RUNNER_OS"
+          echo "Runner arch: $RUNNER_ARCH"
+          uname -a
+      
+      - name: Current date and time
+        run: date

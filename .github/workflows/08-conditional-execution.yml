@@ -1,0 +1,56 @@
+name: 08 - Conditional Execution
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+jobs:
+  conditional-steps:
+    runs-on: arc-runner-set
+    steps:
+      - name: Always run
+        run: echo "This step always runs"
+      
+      - name: Run on push only
+        if: github.event_name == 'push'
+        run: echo "This runs only on push events"
+      
+      - name: Run on pull request only
+        if: github.event_name == 'pull_request'
+        run: echo "This runs only on pull request events"
+      
+      - name: Run on main branch only
+        if: github.ref == 'refs/heads/main'
+        run: echo "This runs only on main branch"
+      
+      - name: Check workflow dispatch input
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "Environment selected: ${{ inputs.environment }}"
+  
+  conditional-job-dev:
+    if: github.event.inputs.environment == 'dev' || github.event_name != 'workflow_dispatch'
+    runs-on: arc-runner-set
+    steps:
+      - name: Dev deployment
+        run: echo "Deploying to DEV environment"
+  
+  conditional-job-prod:
+    if: github.event.inputs.environment == 'prod'
+    runs-on: arc-runner-set
+    steps:
+      - name: Prod deployment
+        run: echo "Deploying to PROD environment"

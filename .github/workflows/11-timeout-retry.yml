@@ -1,0 +1,52 @@
+name: 11 - Timeout and Retry
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  timeout-demo:
+    runs-on: arc-runner-set
+    timeout-minutes: 5
+    steps:
+      - name: Quick task
+        timeout-minutes: 2
+        run: |
+          echo "This step has a 2-minute timeout"
+          echo "Sleeping for 5 seconds..."
+          sleep 5
+          echo "Task completed!"
+      
+      - name: Show timeout info
+        run: |
+          echo "Job timeout: 5 minutes"
+          echo "Previous step timeout: 2 minutes"
+  
+  continue-on-error:
+    runs-on: arc-runner-set
+    steps:
+      - name: Step that might fail
+        id: risky-step
+        continue-on-error: true
+        run: |
+          echo "Attempting risky operation..."
+          # Simulate a 50% chance of failure
+          if [ $((RANDOM % 2)) -eq 0 ]; then
+            echo "Operation succeeded!"
+            exit 0
+          else
+            echo "Operation failed!"
+            exit 1
+          fi
+      
+      - name: Check previous step outcome
+        run: |
+          echo "Previous step outcome: ${{ steps.risky-step.outcome }}"
+          echo "Previous step conclusion: ${{ steps.risky-step.conclusion }}"
+      
+      - name: Cleanup always runs
+        if: always()
+        run: echo "This step runs regardless of previous step outcomes"

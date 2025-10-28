@@ -1,0 +1,48 @@
+name: 14 - Permissions Demo
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  default-permissions:
+    runs-on: arc-runner-set
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Show token permissions
+        run: |
+          echo "This job uses default permissions from workflow level"
+          echo "Contents: read"
+          echo "Issues: read"
+          echo "Pull requests: read"
+  
+  custom-permissions:
+    runs-on: arc-runner-set
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - name: Job with custom permissions
+        run: |
+          echo "This job has custom permissions"
+          echo "Contents: write"
+          echo "Issues: write"
+  
+  no-permissions:
+    runs-on: arc-runner-set
+    permissions: {}
+    steps:
+      - name: Job with no permissions
+        run: |
+          echo "This job has no permissions"
+          echo "Useful for jobs that don't need access to GitHub API"

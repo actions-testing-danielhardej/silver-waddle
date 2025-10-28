@@ -1,0 +1,39 @@
+name: Reusable Workflow
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: string
+      version:
+        description: 'Version to deploy'
+        required: true
+        type: string
+    outputs:
+      deployment-id:
+        description: 'The deployment ID'
+        value: ${{ jobs.deploy.outputs.deployment-id }}
+
+jobs:
+  deploy:
+    runs-on: arc-runner-set
+    outputs:
+      deployment-id: ${{ steps.deploy.outputs.id }}
+    steps:
+      - name: Deploy application
+        id: deploy
+        run: |
+          echo "Deploying to ${{ inputs.environment }}"
+          echo "Version: ${{ inputs.version }}"
+          DEPLOY_ID="deploy-$(date +%s)"
+          echo "id=$DEPLOY_ID" >> $GITHUB_OUTPUT
+          echo "Deployment ID: $DEPLOY_ID"
+      
+      - name: Verify deployment
+        run: |
+          echo "Verifying deployment..."
+          echo "Environment: ${{ inputs.environment }}"
+          echo "Version: ${{ inputs.version }}"
+          echo "Deployment verified successfully!"

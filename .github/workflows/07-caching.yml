@@ -1,0 +1,52 @@
+name: 07 - Caching
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  cache-demo:
+    runs-on: arc-runner-set
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache
+            ./node_modules
+          key: ${{ runner.os }}-cache-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-cache-
+      
+      - name: Check cache status
+        run: |
+          if [ "${{ steps.cache.outputs.cache-hit }}" == "true" ]; then
+            echo "Cache hit! Dependencies restored from cache."
+          else
+            echo "Cache miss! Dependencies will be installed fresh."
+          fi
+      
+      - name: Simulate dependency installation
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          echo "Installing dependencies..."
+          mkdir -p ~/.cache
+          echo "Cached data" > ~/.cache/data.txt
+          echo "Dependencies installed!"
+      
+      - name: Verify cached data
+        run: |
+          echo "Checking for cached data..."
+          if [ -f ~/.cache/data.txt ]; then
+            echo "Found cached data:"
+            cat ~/.cache/data.txt
+          else
+            echo "No cached data found"
+          fi

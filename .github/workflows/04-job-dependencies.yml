@@ -1,0 +1,48 @@
+name: 04 - Job Dependencies
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  setup:
+    runs-on: arc-runner-set
+    outputs:
+      build-id: ${{ steps.generate-id.outputs.build-id }}
+    steps:
+      - name: Generate build ID
+        id: generate-id
+        run: |
+          BUILD_ID="build-$(date +%s)"
+          echo "build-id=$BUILD_ID" >> $GITHUB_OUTPUT
+          echo "Generated build ID: $BUILD_ID"
+  
+  build:
+    needs: setup
+    runs-on: arc-runner-set
+    steps:
+      - name: Build application
+        run: |
+          echo "Building with ID: ${{ needs.setup.outputs.build-id }}"
+          echo "Build completed!"
+  
+  test:
+    needs: build
+    runs-on: arc-runner-set
+    steps:
+      - name: Run tests
+        run: |
+          echo "Running tests for build: ${{ needs.setup.outputs.build-id }}"
+          echo "All tests passed!"
+  
+  deploy:
+    needs: [build, test]
+    runs-on: arc-runner-set
+    steps:
+      - name: Deploy application
+        run: |
+          echo "Deploying build: ${{ needs.setup.outputs.build-id }}"
+          echo "Deployment successful!"

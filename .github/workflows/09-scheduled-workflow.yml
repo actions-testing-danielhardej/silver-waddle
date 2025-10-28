@@ -1,0 +1,32 @@
+name: 09 - Scheduled Workflow
+
+on:
+  schedule:
+    # Run at 00:00 UTC every day
+    - cron: '0 0 * * *'
+    # Run every 6 hours
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  scheduled-job:
+    runs-on: arc-runner-set
+    steps:
+      - name: Print schedule info
+        run: |
+          echo "This workflow runs on a schedule"
+          echo "Current time: $(date)"
+          echo "Event name: ${{ github.event_name }}"
+      
+      - name: Perform scheduled task
+        run: |
+          echo "Performing scheduled maintenance task..."
+          echo "Task completed at: $(date)"
+      
+      - name: Generate report
+        run: |
+          echo "=== Scheduled Task Report ===" > report.txt
+          echo "Execution time: $(date)" >> report.txt
+          echo "Trigger: ${{ github.event_name }}" >> report.txt
+          echo "Repository: ${{ github.repository }}" >> report.txt
+          cat report.txt

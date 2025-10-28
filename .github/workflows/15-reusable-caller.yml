@@ -1,0 +1,22 @@
+name: 15 - Reusable Workflow Caller
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  call-local-workflow:
+    uses: ./.github/workflows/reusable-workflow.yml
+    with:
+      environment: production
+      version: "1.0.0"
+  
+  call-with-secrets:
+    uses: ./.github/workflows/reusable-workflow.yml
+    with:
+      environment: staging
+      version: "1.0.1"
+    secrets: inherit
